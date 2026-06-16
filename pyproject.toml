@@ -1,7 +1,7 @@
 [project]
 name = "rag-against-the-machine"
 version = "0.1.0"
-description = "Add your description here"
+description = "Retrieval-Augmented Generation (RAG) system that can answer questions about a codebase"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
