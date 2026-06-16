@@ -3,5 +3,32 @@ name = "rag-against-the-machine"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13.1"
-dependencies = []
+requires-python = ">=3.10"
+dependencies = [
+    "flake8>=7.3.0",
+    "mypy>=2.1.0",
+    "ruff>=0.15.17",
+]
+
+[tool.ruff]
+exclude = [
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+]
+
+line-length = 80
+indent-width = 4
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
