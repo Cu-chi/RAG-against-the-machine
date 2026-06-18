@@ -4,13 +4,13 @@ MYPY_FLAGS = --warn-return-any --warn-unused-ignores --ignore-missing-imports \
 CACHES = __pycache__ .mypy_cache .ruff_cache
 
 run:
-	uv run python $(MAIN)
+	uv run python $(MAIN) $(ARGS)
 
 install:
 	uv sync
 
 debug:
-	uv run python -m pdb $(MAIN)
+	uv run python -m pdb $(MAIN) $(ARGS)
 
 clean:
 	$(foreach cache, $(CACHES), @rm -rf $$(find . -type d -name "$(cache)"))
