@@ -19,6 +19,9 @@ clean:
 format:
 	uv run ruff format
 
+format-check:
+	uv run ruff check
+
 lint:
 	uv run python -m flake8 src
 	uv run python -m mypy src $(MYPY_FLAGS)
