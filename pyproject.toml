@@ -3,11 +3,21 @@ name = "rag-against-the-machine"
 version = "0.1.0"
 description = "Retrieval-Augmented Generation (RAG) system that can answer questions about a codebase"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 dependencies = [
+    "accelerate>=1.14.0",
+    "chromadb>=1.5.9",
+    "dspy>=3.2.1",
+    "fire>=0.7.1",
     "flake8>=7.3.0",
+    "langchain-chroma>=1.1.0",
+    "langchain-huggingface>=1.2.2",
+    "langchain-text-splitters>=1.1.2",
     "mypy>=2.1.0",
+    "pydantic>=2.13.4",
     "ruff>=0.15.17",
+    "torch>=2.12.1",
+    "transformers>=5.12.1",
 ]
 
 [tool.ruff]
@@ -22,10 +32,11 @@ indent-width = 4
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F"]
+select = ["E", "F", "D"]
 ignore = []
-fixable = ["ALL"]
-unfixable = []
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
 
 [tool.ruff.format]
 quote-style = "double"
