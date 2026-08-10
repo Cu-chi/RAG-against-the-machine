@@ -39,15 +39,16 @@ def create_documents(extensions_files: dict[str, list[str]]) \
     return ext_documents
 
 
-def chunk_files(ext_documents: dict[str, list[Document]]) -> list[Document]:
+def chunk_files(ext_documents: dict[str, list[Document]],
+                max_chunk_size: int) -> list[Document]:
     chunks: list[Document] = []
     py_splitter = PythonCodeTextSplitter(
-        chunk_size=1000,
+        chunk_size=max_chunk_size,
         chunk_overlap=300,
         add_start_index=True
     )
     md_splitter = MarkdownTextSplitter(
-        chunk_size=1000,
+        chunk_size=max_chunk_size,
         chunk_overlap=300
     )
     for extension, documents in ext_documents.items():
