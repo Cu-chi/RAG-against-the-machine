@@ -28,7 +28,7 @@ def create_documents(extensions_files: dict[str, list[str]]) \
     ext_documents: dict[str, list[Document]] = {
         extension: [] for extension in extensions_files
     }
-    for extension, files in extensions_files.values():
+    for extension, files in extensions_files.items():
         for file in files:
             with open(file, "r", encoding="utf-8", errors="ignore") as f:
                 file_content: str = f.read()
