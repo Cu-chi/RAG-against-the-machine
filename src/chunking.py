@@ -30,12 +30,15 @@ def create_documents(extensions_files: dict[str, list[str]]) \
     }
     for extension, files in extensions_files.items():
         for file in files:
-            with open(file, "r", encoding="utf-8", errors="ignore") as f:
-                file_content: str = f.read()
-            ext_documents[extension].append(Document(
-                page_content=file_content,
-                metadata={"source": file, "extension": extension},
-            ))
+            try:
+                with open(file, "r", encoding="utf-8", errors="ignore") as f:
+                    file_content: str = f.read()
+                ext_documents[extension].append(Document(
+                    page_content=file_content,
+                    metadata={"source": file, "extension": extension},
+                ))
+            except Exception as e:
+                print(f"Warning: Could not read {file}: {e}")
     return ext_documents
 
 
