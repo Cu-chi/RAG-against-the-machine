@@ -43,7 +43,8 @@ def chunk_files(ext_documents: dict[str, list[Document]]) -> list[Document]:
     chunks: list[Document] = []
     py_splitter = PythonCodeTextSplitter(
         chunk_size=1000,
-        chunk_overlap=300
+        chunk_overlap=300,
+        add_start_index=True
     )
     md_splitter = MarkdownTextSplitter(
         chunk_size=1000,
