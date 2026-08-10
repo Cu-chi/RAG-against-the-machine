@@ -44,12 +44,13 @@ def chunk_files(ext_documents: dict[str, list[Document]],
     chunks: list[Document] = []
     py_splitter = PythonCodeTextSplitter(
         chunk_size=max_chunk_size,
-        chunk_overlap=300,
+        chunk_overlap=int(max_chunk_size * 0.15),
         add_start_index=True
     )
     md_splitter = MarkdownTextSplitter(
         chunk_size=max_chunk_size,
-        chunk_overlap=300
+        chunk_overlap=int(max_chunk_size * 0.15),
+        add_start_index=True
     )
     for extension, documents in ext_documents.items():
         if extension == ".py":
