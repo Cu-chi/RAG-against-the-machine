@@ -22,7 +22,8 @@ class UnansweredQuestion(BaseModel):
 class AnsweredQuestion(UnansweredQuestion):
     """Model that represents an answered question."""
 
-    sources: List
+    sources: List[MinimalSource]
+    answer: str
 
 
 class RagDataset(BaseModel):
