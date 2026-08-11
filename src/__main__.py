@@ -1,5 +1,6 @@
 import fire
-from chunking import get_files, create_documents, chunk_files
+from .chunking import get_files, create_documents, chunk_files
+from .indexing import store_chunks, search_query
 
 
 def main(max_chunk_size: int = 2000) -> None:
@@ -7,11 +8,10 @@ def main(max_chunk_size: int = 2000) -> None:
         ".py",
         ".md"
     ])
-    for extension in extensions_files:
-        print(f"{extension}: {len(extensions_files[extension])}")
     extensions_documents = create_documents(extensions_files)
-    documents = chunk_files(extensions_documents, max_chunk_size)
-    print(documents)
+    chunks = chunk_files(extensions_documents, max_chunk_size)
+    store_chunks(chunks)
+    results, scores = search_query("Is there any dependency?")
 
 
 if __name__ == "__main__":
