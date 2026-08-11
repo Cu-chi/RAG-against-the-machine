@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "accelerate>=1.14.0",
+    "bm25s>=0.3.10",
     "chromadb>=1.5.9",
     "dspy>=3.2.1",
     "fire>=0.7.1",
