@@ -1,16 +1,16 @@
-MAIN = src/main.py
+MAIN = src
 MYPY_FLAGS = --warn-return-any --warn-unused-ignores --ignore-missing-imports \
 --disallow-untyped-defs --check-untyped-defs
 CACHES = __pycache__ .mypy_cache .ruff_cache
 
 run:
-	uv run python $(MAIN) $(ARGS)
+	uv run python -m $(MAIN) $(ARGS)
 
 install:
 	uv sync
 
 debug:
-	uv run python -m pdb $(MAIN) $(ARGS)
+	uv run python -m pdb -m $(MAIN) $(ARGS)
 
 clean:
 	$(foreach cache, $(CACHES), @rm -rf $$(find . -type d -name "$(cache)"))
