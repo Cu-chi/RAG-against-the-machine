@@ -1,10 +1,12 @@
 import fire
 import uuid
 import json
+from tqdm import tqdm
 from .chunking import get_files, create_documents, chunk_files
 from .indexing import store_chunks, search_query
 from .models import MinimalSearchResults, MinimalSource, \
-    RagDataset, UnansweredQuestion, StudentSearchResults
+    RagDataset, UnansweredQuestion, StudentSearchResults, \
+    AnsweredQuestion
 from pathlib import Path
 
 
@@ -62,7 +64,7 @@ class RAGCLI:
         rag_dataset = RagDataset.model_validate_json(json_dataset)
 
         search_results = []
-        for question in rag_dataset.rag_questions:
+        for question in tqdm(rag_dataset.rag_questions):
             if isinstance(question, UnansweredQuestion):
                 results = self.search(question.question, k,
                                       question.question_id)
@@ -78,6 +80,9 @@ class RAGCLI:
             f.write(student_search_results.model_dump_json(indent=4))
 
         return student_search_results
+
+    def answer(self, query: str, k: int) -> AnsweredQuestion:
+        pass
 
 
 if __name__ == "__main__":
