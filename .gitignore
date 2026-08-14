@@ -5,9 +5,7 @@
 .ruff_cache/
 __pycache__/
 
-datasets_public/
-vllm-0.10.1/
-
 data/processed/
+data/output/
 
 moulinette_pkg/
