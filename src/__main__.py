@@ -51,7 +51,10 @@ class RAGCLI:
             retrieved_sources=minimal_sources
         )
 
-        return search_results
+        return StudentSearchResults(
+            search_results=[search_results],
+            k=k
+        )
 
     def search_dataset(self, dataset_path: str,
                        k: int, save_directory: str) -> StudentSearchResults:
