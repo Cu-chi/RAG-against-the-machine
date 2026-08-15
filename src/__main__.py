@@ -1,10 +1,10 @@
 import fire
 import uuid
-import json
+import bm25s
 from tqdm import tqdm
-from .chunking import get_files, create_documents, chunk_files
-from .indexing import store_chunks, search_query
-from .models import MinimalSearchResults, MinimalSource, \
+from src.chunking import get_files, create_documents, chunk_files
+from src.indexing import store_chunks, search_query, load_retriever
+from src.models import MinimalSearchResults, MinimalSource, \
     RagDataset, UnansweredQuestion, StudentSearchResults, \
     AnsweredQuestion
 from pathlib import Path
@@ -23,16 +23,19 @@ class RAGCLI:
         store_chunks(chunks)
 
     def search(self, query: str, k: int,
-               id: str = str(uuid.uuid4())) -> MinimalSearchResults:
+               id: str = str(uuid.uuid4()),
+               retriever: bm25s.BM25 | None = None) -> MinimalSearchResults:
         if k <= 0:
             raise Exception
-        results, scores = search_query(query, k)
+        if retriever is None:
+            retriever = load_retriever()
+        documents = search_query(query, retriever, k)
 
         minimal_sources = []
-        for result in results[0]:
-            if not isinstance(result, dict):
+        for doc in documents[0]:
+            if not isinstance(doc, dict):
                 continue
-            metadata = result.get("metadata", {})
+            metadata = doc.get("metadata", {})
             if not isinstance(metadata, dict):
                 continue
             minimal_sources.append(MinimalSource(
@@ -64,10 +67,12 @@ class RAGCLI:
         rag_dataset = RagDataset.model_validate_json(json_dataset)
 
         search_results = []
+        retriever = load_retriever()
         for question in tqdm(rag_dataset.rag_questions):
             if isinstance(question, UnansweredQuestion):
                 results = self.search(question.question, k,
-                                      question.question_id)
+                                      question.question_id,
+                                      retriever)
                 search_results.append(results)
         student_search_results = StudentSearchResults(
             search_results=search_results,
