@@ -126,12 +126,14 @@ class RAGCLI:
 
         json_results = results_path.read_text()
         search_results = StudentSearchResults.model_validate_json(json_results)
+        print(f"Loaded {len(search_results.search_results)} questions")
 
         generator = LLMGenerator()
         context_builder = ContextBuilder()
 
         answers = []
-        for search in search_results.search_results:
+        for search in tqdm(search_results.search_results,
+                           desc="Generating answers"):
             context = context_builder.format_context(search)
 
             answer = generator.generate_answer(search.question, context)
