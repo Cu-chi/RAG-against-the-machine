@@ -185,6 +185,7 @@ class RAGCLI:
 
         score = 0.0
         for question in rag_dataset.rag_questions:
+            found = False
             results_index = find_question_id_index(question.question_id,
                                                    search_results)
             if results_index < 0:
@@ -204,7 +205,9 @@ class RAGCLI:
                             res_source.first_character_index,
                             res_source.last_character_index,
                         ) > 0.05:
-                            score += 1.0
+                            found = True
+            if found:
+                score += 1.0
         return score / len(rag_dataset.rag_questions)
 
 
