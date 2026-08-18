@@ -7,10 +7,11 @@ from src.chunking import get_files, create_documents, chunk_files
 from src.indexing import store_chunks, search_query, load_retriever
 from src.models import MinimalSearchResults, MinimalSource, \
     RagDataset, UnansweredQuestion, StudentSearchResults, \
-    AnsweredQuestion, MinimalAnswer, StudentSearchResultsAndAnswer
+    MinimalAnswer, StudentSearchResultsAndAnswer, AnsweredQuestion
 from src.generation import LLMGenerator
 from src.context import ContextBuilder
 from pathlib import Path
+from src.utils import find_question_id_index, calculate_IoU
 
 
 class RAGCLI:
@@ -99,7 +100,8 @@ class RAGCLI:
         search_results = self.search(query, k, retriever=retriver)
 
         context_builder = ContextBuilder()
-        context = context_builder.format_context(search_results.search_results[0])
+        context = context_builder.format_context(
+            search_results.search_results[0])
 
         answer = generator.generate_answer(query, context)
 
@@ -157,6 +159,53 @@ class RAGCLI:
                 student_search_results_and_answer.model_dump_json(indent=4))
 
         return student_search_results_and_answer
+
+    def evaluate(self, student_search_results_path: str,
+                 dataset_path: str) -> float:
+        print(dataset_path)
+        if not dataset_path.endswith(".json"):
+            raise Exception
+        dataset = Path(dataset_path)
+        if not dataset.exists():
+            raise Exception
+
+        dataset_json = dataset.read_text()
+        rag_dataset = RagDataset \
+            .model_validate_json(dataset_json)
+
+        if not student_search_results_path.endswith(".json"):
+            raise Exception
+        search_results_path = Path(student_search_results_path)
+        if not dataset.exists():
+            raise Exception
+
+        search_results_json = search_results_path.read_text()
+        search_results = StudentSearchResults \
+            .model_validate_json(search_results_json)
+
+        score = 0.0
+        for question in rag_dataset.rag_questions:
+            results_index = find_question_id_index(question.question_id,
+                                                   search_results)
+            if results_index < 0:
+                print(f"{question.question_id} not "
+                      f"found in {search_results_path}")
+                continue
+            results = search_results.search_results[results_index]
+            if not isinstance(question, AnsweredQuestion):
+                print(f"skipping not answered question {question.question_id}")
+                continue
+            for source in question.sources:
+                for res_source in results.retrieved_sources:
+                    if source.file_path == res_source.file_path:
+                        if calculate_IoU(
+                            source.first_character_index,
+                            source.last_character_index,
+                            res_source.first_character_index,
+                            res_source.last_character_index,
+                        ) > 0.05:
+                            score += 1.0
+        return score / len(rag_dataset.rag_questions)
 
 
 def main() -> None:
