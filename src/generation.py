@@ -1,13 +1,12 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from transformers.utils import logging
+from transformers.utils.logging import disable_progress_bar
 import torch
-
-
-logging.set_verbosity_error()
 
 
 class LLMGenerator:
     def __init__(self, model_name: str = "Qwen/Qwen3-0.6B") -> None:
+        print("Loading model...")
+        disable_progress_bar()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
