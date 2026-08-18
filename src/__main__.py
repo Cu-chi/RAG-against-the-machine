@@ -204,7 +204,7 @@ class RAGCLI:
                             source.last_character_index,
                             res_source.first_character_index,
                             res_source.last_character_index,
-                        ) > 0.05:
+                        ) >= 0.05:
                             found = True
             if found:
                 score += 1.0
