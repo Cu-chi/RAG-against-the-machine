@@ -75,7 +75,8 @@ class RAGCLI:
 
         search_results = []
         retriever = load_retriever()
-        for question in tqdm(rag_dataset.rag_questions):
+        for question in tqdm(rag_dataset.rag_questions,
+                             desc="Indexing questions"):
             if isinstance(question, UnansweredQuestion):
                 results = self.search(question.question, k,
                                       question.question_id,
@@ -162,7 +163,6 @@ class RAGCLI:
 
     def evaluate(self, student_search_results_path: str,
                  dataset_path: str) -> float:
-        print(dataset_path)
         if not dataset_path.endswith(".json"):
             raise Exception
         dataset = Path(dataset_path)
@@ -209,6 +209,9 @@ class RAGCLI:
             if found:
                 score += 1.0
         return score / len(rag_dataset.rag_questions)
+
+    def __str__(self):
+        return "a"
 
 
 def main() -> None:
