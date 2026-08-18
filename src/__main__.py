@@ -2,11 +2,14 @@ import fire
 import uuid
 import bm25s
 from tqdm import tqdm
+from dotenv import load_dotenv
 from src.chunking import get_files, create_documents, chunk_files
 from src.indexing import store_chunks, search_query, load_retriever
 from src.models import MinimalSearchResults, MinimalSource, \
     RagDataset, UnansweredQuestion, StudentSearchResults, \
-    AnsweredQuestion
+    AnsweredQuestion, MinimalAnswer, StudentSearchResultsAndAnswer
+from src.generation import LLMGenerator
+from src.context import ContextBuilder
 from pathlib import Path
 
 
@@ -24,7 +27,7 @@ class RAGCLI:
 
     def search(self, query: str, k: int,
                id: str = str(uuid.uuid4()),
-               retriever: bm25s.BM25 | None = None) -> MinimalSearchResults:
+               retriever: bm25s.BM25 | None = None) -> StudentSearchResults:
         if k <= 0:
             raise Exception
         if retriever is None:
@@ -76,7 +79,7 @@ class RAGCLI:
                 results = self.search(question.question, k,
                                       question.question_id,
                                       retriever)
-                search_results.append(results)
+                search_results.append(results.search_results[0])
         student_search_results = StudentSearchResults(
             search_results=search_results,
             k=k)
@@ -89,9 +92,75 @@ class RAGCLI:
 
         return student_search_results
 
-    def answer(self, query: str, k: int) -> AnsweredQuestion:
-        pass
+    def answer(self, query: str, k: int) -> StudentSearchResultsAndAnswer:
+        generator = LLMGenerator()
+
+        retriver = load_retriever()
+        search_results = self.search(query, k, retriever=retriver)
+
+        context_builder = ContextBuilder()
+        context = context_builder.format_context(search_results.search_results[0])
+
+        answer = generator.generate_answer(query, context)
+
+        minimal_answer = MinimalAnswer(
+            answer=answer,
+            question_id=search_results.search_results[0].question_id,
+            question=query,
+            retrieved_sources=search_results
+            .search_results[0].retrieved_sources
+        )
+
+        return StudentSearchResultsAndAnswer(
+            search_results=[minimal_answer],
+            k=k
+        )
+
+    def answer_dataset(self, student_search_results_path: str,
+                       save_directory: str) -> StudentSearchResultsAndAnswer:
+        if not student_search_results_path.endswith(".json"):
+            raise Exception
+        results_path = Path(student_search_results_path)
+        if not results_path.exists():
+            raise Exception
+
+        json_results = results_path.read_text()
+        search_results = StudentSearchResults.model_validate_json(json_results)
+
+        generator = LLMGenerator()
+        context_builder = ContextBuilder()
+
+        answers = []
+        for search in search_results.search_results:
+            context = context_builder.format_context(search)
+
+            answer = generator.generate_answer(search.question, context)
+            answers.append(MinimalAnswer(
+                answer=answer,
+                question_id=search.question_id,
+                question=search.question,
+                retrieved_sources=search.retrieved_sources
+            ))
+
+        student_search_results_and_answer = StudentSearchResultsAndAnswer(
+            search_results=answers,
+            k=search_results.k
+        )
+
+        save_dir = Path(save_directory)
+        save_dir.mkdir(parents=True, exist_ok=True)
+
+        with open(f"{save_dir}/{results_path.name}", "w+") as f:
+            f.write(
+                student_search_results_and_answer.model_dump_json(indent=4))
+
+        return student_search_results_and_answer
+
+
+def main() -> None:
+    load_dotenv()
+    fire.Fire(RAGCLI)
 
 
 if __name__ == "__main__":
-    fire.Fire(RAGCLI)
+    main()
