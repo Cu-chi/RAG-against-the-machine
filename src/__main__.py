@@ -18,7 +18,7 @@ class RAGCLI:
     def index(self, max_chunk_size: int = 2000) -> None:
         if max_chunk_size < 0:
             raise Exception
-        extensions_files = get_files("data/raw/vllm-0.10.1",  [
+        extensions_files = get_files("data/raw",  [
             ".py",
             ".md"
         ])
