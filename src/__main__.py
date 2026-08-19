@@ -176,7 +176,7 @@ class RAGCLI:
         if not student_search_results_path.endswith(".json"):
             raise Exception
         search_results_path = Path(student_search_results_path)
-        if not dataset.exists():
+        if not search_results_path.exists():
             raise Exception
 
         search_results_json = search_results_path.read_text()
