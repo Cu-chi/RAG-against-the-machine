@@ -10,7 +10,7 @@ def find_question_id_index(qid: str,
 
 
 def calculate_IoU(start_a: int, end_a: int,
-                     start_b: int, end_b: int) -> float:
+                  start_b: int, end_b: int) -> float:
     intersection_start = max(start_a, start_b)
     intersection_end = min(end_a, end_b)
     intersection = intersection_end - intersection_start
