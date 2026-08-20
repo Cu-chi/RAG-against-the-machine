@@ -56,6 +56,6 @@ Answer:"""}
             output_ids[len(input_ids):]
             for input_ids, output_ids in zip(inputs.input_ids, generated_ids)
         ]
-        response = self.tokenizer.batch_decode(generated_ids,
-                                               skip_special_tokens=True)[0]
+        response = self.tokenizer.decode(generated_ids,
+                                         skip_special_tokens=True)[0]
         return response.strip()
