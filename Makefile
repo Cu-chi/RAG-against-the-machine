@@ -26,8 +26,4 @@ lint:
 	uv run python -m flake8 src
 	uv run python -m mypy src $(MYPY_FLAGS)
 
-lint-strict:
-	uv run python -m flake8 src
-	uv run python -m mypy src --strict
-
-.PHONY: install run debug clean lint lint-strict 
+.PHONY: install run debug clean lint

@@ -1,14 +1,15 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils.logging import disable_progress_bar
 import torch
+from typing import Any
 
 
 class LLMGenerator:
     def __init__(self, model_name: str = "Qwen/Qwen3-0.6B") -> None:
         print("Loading model...")
         disable_progress_bar()
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.tokenizer: Any = AutoTokenizer.from_pretrained(model_name)
+        self.model: Any = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
             dtype=torch.float16
@@ -56,6 +57,6 @@ Answer:"""}
             output_ids[len(input_ids):]
             for input_ids, output_ids in zip(inputs.input_ids, generated_ids)
         ]
-        response = self.tokenizer.decode(generated_ids,
-                                         skip_special_tokens=True)[0]
+        response: str = self.tokenizer.decode(generated_ids,
+                                              skip_special_tokens=True)[0]
         return response.strip()

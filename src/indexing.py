@@ -28,4 +28,5 @@ def search_query(query: str, retriever: bm25s.BM25,
     documents = retriever.retrieve(query_tokens, k=k,
                                    return_as="documents")
 
-    return documents
+    docs: list = documents[0].tolist()
+    return docs

@@ -210,9 +210,6 @@ class RAGCLI:
                 score += 1.0
         return score / len(rag_dataset.rag_questions)
 
-    def __str__(self):
-        return "a"
-
 
 def main() -> None:
     load_dotenv()
