@@ -34,9 +34,8 @@ class RAGCLI:
         if retriever is None:
             retriever = load_retriever()
         documents = search_query(query, retriever, k)
-
         minimal_sources = []
-        for doc in documents[0]:
+        for doc in documents:
             if not isinstance(doc, dict):
                 continue
             metadata = doc.get("metadata", {})
