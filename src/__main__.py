@@ -5,7 +5,8 @@ import sys
 from tqdm import tqdm
 from dotenv import load_dotenv
 from src.chunking import get_files, create_documents, chunk_files
-from src.indexing import store_chunks, search_query, load_retriever
+from src.indexing import store_chunks
+from src.retriever import search_query, load_retriever
 from src.models import MinimalSearchResults, MinimalSource, \
     RagDataset, UnansweredQuestion, StudentSearchResults, \
     MinimalAnswer, StudentSearchResultsAndAnswer, AnsweredQuestion
