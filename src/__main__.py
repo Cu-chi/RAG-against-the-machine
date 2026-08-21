@@ -26,6 +26,10 @@ class RAGCLI:
             ".md"
         ])
         extensions_documents = create_documents(extensions_files)
+        if len(extensions_documents) == 0:
+            print("no document to chunk, can't index. "
+                  "data/raw folder must have .md and .py files")
+            sys.exit(1)
         chunks = chunk_files(extensions_documents, max_chunk_size)
         store_chunks(chunks)
 
@@ -35,6 +39,9 @@ class RAGCLI:
             -> StudentSearchResults:
         if k <= 0:
             print("k must be > 0")
+            sys.exit(1)
+        if query == "" or query.isspace():
+            print("query is empty")
             sys.exit(1)
         if retriever is None:
             retriever = load_retriever()
@@ -138,13 +145,6 @@ class RAGCLI:
         )
 
     def answer(self, query: str, k: int) -> None:
-        if query == "" or query.isspace():
-            print("query is empty")
-            sys.exit(1)
-        if k <= 0:
-            print("k must be > 0")
-            sys.exit(1)
-
         answer_result = self._answer_internal(query, k)
 
         print(answer_result.model_dump_json(indent=4))
@@ -256,4 +256,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}")
+    except KeyboardInterrupt:
+        print("Exited")
