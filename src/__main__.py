@@ -1,6 +1,7 @@
 import fire
 import uuid
 import bm25s
+import sys
 from tqdm import tqdm
 from dotenv import load_dotenv
 from src.chunking import get_files, create_documents, chunk_files
@@ -16,8 +17,9 @@ from src.utils import find_question_id_index, calculate_IoU
 
 class RAGCLI:
     def index(self, max_chunk_size: int = 2000) -> None:
-        if max_chunk_size < 0:
-            raise Exception
+        if max_chunk_size <= 0:
+            print("max_chunk_size must be > 0")
+            sys.exit(1)
         extensions_files = get_files("data/raw",  [
             ".py",
             ".md"
@@ -31,7 +33,8 @@ class RAGCLI:
                          retriever: bm25s.BM25 | None = None) \
             -> StudentSearchResults:
         if k <= 0:
-            raise Exception
+            print("k must be > 0")
+            sys.exit(1)
         if retriever is None:
             retriever = load_retriever()
         documents = search_query(query, retriever, k)
@@ -72,12 +75,15 @@ class RAGCLI:
     def search_dataset(self, dataset_path: str,
                        k: int, save_directory: str) -> None:
         if k <= 0:
-            raise Exception
+            print("k must be > 0")
+            sys.exit(1)
         if not dataset_path.endswith(".json"):
-            raise Exception
+            print("dataset_path must point to a .json file")
+            sys.exit(1)
         dataset = Path(dataset_path)
         if not dataset.exists():
-            raise Exception
+            print(f"'{dataset_path}' doesn't exist")
+            sys.exit(1)
 
         json_dataset = dataset.read_text()
         rag_dataset = RagDataset.model_validate_json(json_dataset)
@@ -131,6 +137,13 @@ class RAGCLI:
         )
 
     def answer(self, query: str, k: int) -> None:
+        if query == "" or query.isspace():
+            print("query is empty")
+            sys.exit(1)
+        if k <= 0:
+            print("k must be > 0")
+            sys.exit(1)
+
         answer_result = self._answer_internal(query, k)
 
         print(answer_result.model_dump_json(indent=4))
@@ -138,10 +151,12 @@ class RAGCLI:
     def answer_dataset(self, student_search_results_path: str,
                        save_directory: str) -> None:
         if not student_search_results_path.endswith(".json"):
-            raise Exception
+            print("student_search_results_path must point to a .json file")
+            sys.exit(1)
         results_path = Path(student_search_results_path)
         if not results_path.exists():
-            raise Exception
+            print(f"'{student_search_results_path}' doesn't exist")
+            sys.exit(1)
 
         json_results = results_path.read_text()
         search_results = StudentSearchResults.model_validate_json(json_results)
@@ -182,20 +197,24 @@ class RAGCLI:
     def evaluate(self, student_search_results_path: str,
                  dataset_path: str) -> float:
         if not dataset_path.endswith(".json"):
-            raise Exception
+            print("dataset_path must point to a .json file")
+            sys.exit(1)
         dataset = Path(dataset_path)
         if not dataset.exists():
-            raise Exception
+            print(f"{dataset} doesn't exist")
+            sys.exit(1)
 
         dataset_json = dataset.read_text()
         rag_dataset = RagDataset \
             .model_validate_json(dataset_json)
 
         if not student_search_results_path.endswith(".json"):
-            raise Exception
+            print("student_search_results_path must point to a .json file")
+            sys.exit(1)
         search_results_path = Path(student_search_results_path)
         if not search_results_path.exists():
-            raise Exception
+            print(f"{student_search_results_path} doesn't exist")
+            sys.exit(1)
 
         search_results_json = search_results_path.read_text()
         search_results = StudentSearchResults \
