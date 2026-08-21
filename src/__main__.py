@@ -26,9 +26,10 @@ class RAGCLI:
         chunks = chunk_files(extensions_documents, max_chunk_size)
         store_chunks(chunks)
 
-    def search(self, query: str, k: int,
-               id: str = str(uuid.uuid4()),
-               retriever: bm25s.BM25 | None = None) -> StudentSearchResults:
+    def _search_internal(self, query: str, k: int,
+                         id: str = str(uuid.uuid4()),
+                         retriever: bm25s.BM25 | None = None) \
+            -> StudentSearchResults:
         if k <= 0:
             raise Exception
         if retriever is None:
@@ -59,8 +60,17 @@ class RAGCLI:
             k=k
         )
 
+    def search(self, query: str, k: int,
+               id: str = str(uuid.uuid4()),
+               retriever: bm25s.BM25 | None = None) -> None:
+        search_results: StudentSearchResults = self._search_internal(query, k,
+                                                                     id,
+                                                                     retriever)
+
+        print(search_results.model_dump_json(indent=4))
+
     def search_dataset(self, dataset_path: str,
-                       k: int, save_directory: str) -> StudentSearchResults:
+                       k: int, save_directory: str) -> None:
         if k <= 0:
             raise Exception
         if not dataset_path.endswith(".json"):
@@ -77,9 +87,9 @@ class RAGCLI:
         for question in tqdm(rag_dataset.rag_questions,
                              desc="Indexing questions"):
             if isinstance(question, UnansweredQuestion):
-                results = self.search(question.question, k,
-                                      question.question_id,
-                                      retriever)
+                results = self._search_internal(question.question, k,
+                                                question.question_id,
+                                                retriever)
                 search_results.append(results.search_results[0])
         student_search_results = StudentSearchResults(
             search_results=search_results,
@@ -88,16 +98,18 @@ class RAGCLI:
         save_dir = Path(save_directory)
         save_dir.mkdir(parents=True, exist_ok=True)
 
+        model_json = student_search_results.model_dump_json(indent=4)
         with open(f"{save_dir}/{dataset.name}", "w+") as f:
-            f.write(student_search_results.model_dump_json(indent=4))
+            f.write(model_json)
 
-        return student_search_results
+        print(model_json)
 
-    def answer(self, query: str, k: int) -> StudentSearchResultsAndAnswer:
+    def _answer_internal(self, query: str,
+                         k: int) -> StudentSearchResultsAndAnswer:
         generator = LLMGenerator()
 
         retriver = load_retriever()
-        search_results = self.search(query, k, retriever=retriver)
+        search_results = self._search_internal(query, k, retriever=retriver)
 
         context_builder = ContextBuilder()
         context = context_builder.format_context(
@@ -118,8 +130,13 @@ class RAGCLI:
             k=k
         )
 
+    def answer(self, query: str, k: int) -> None:
+        answer_result = self._answer_internal(query, k)
+
+        print(answer_result.model_dump_json(indent=4))
+
     def answer_dataset(self, student_search_results_path: str,
-                       save_directory: str) -> StudentSearchResultsAndAnswer:
+                       save_directory: str) -> None:
         if not student_search_results_path.endswith(".json"):
             raise Exception
         results_path = Path(student_search_results_path)
@@ -154,11 +171,13 @@ class RAGCLI:
         save_dir = Path(save_directory)
         save_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(f"{save_dir}/{results_path.name}", "w+") as f:
-            f.write(
-                student_search_results_and_answer.model_dump_json(indent=4))
+        model_json = student_search_results_and_answer.model_dump_json(
+            indent=4)
 
-        return student_search_results_and_answer
+        with open(f"{save_dir}/{results_path.name}", "w+") as f:
+            f.write(model_json)
+
+        print(model_json)
 
     def evaluate(self, student_search_results_path: str,
                  dataset_path: str) -> float:
