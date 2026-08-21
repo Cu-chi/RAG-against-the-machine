@@ -19,7 +19,7 @@ class LLMGenerator:
     def generate_answer(self, query: str, context: str) -> str:
         messages = [
             {"role": "system", "content": "You are a helpful coding assistant."
-                                          "Answer based on the provided"
+                                          " Answer based on the provided "
                                           "context only."},
             {"role": "user", "content":
                 f"""Use the following pieces of retrieved context to answer
