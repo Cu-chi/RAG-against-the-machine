@@ -183,7 +183,8 @@ class RAGCLI:
             .model_validate_json(search_results_json)
 
         score = 0.0
-        for question in rag_dataset.rag_questions:
+        for question in tqdm(rag_dataset.rag_questions,
+                             desc="Evaluating..."):
             found = False
             results_index = find_question_id_index(question.question_id,
                                                    search_results)

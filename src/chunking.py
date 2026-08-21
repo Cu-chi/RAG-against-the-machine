@@ -1,4 +1,5 @@
 import glob
+from tqdm import tqdm
 from typing import Any
 from langchain_core.documents import Document
 from langchain_text_splitters import PythonCodeTextSplitter, \
@@ -54,7 +55,7 @@ def chunk_files(documents: list[Document],
         chunk_overlap=int(max_chunk_size * 0.15),
         add_start_index=True
     )
-    for document in documents:
+    for document in tqdm(documents, desc="Chunking..."):
         doc_chunks = []
         extension: str | Any = document.metadata.get("extension")
 
