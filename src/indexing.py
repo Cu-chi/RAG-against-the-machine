@@ -13,7 +13,7 @@ def store_chunks(chunks: List[Document],
 
     retriever = bm25s.BM25(corpus=metadata_corpus)
     print("Indexing curpus...")
-    retriever.index(corpus_tokens)
+    retriever.index(corpus_tokens, leave_progress=True)
 
     Path(output).mkdir(parents=True, exist_ok=True)
     print(f"Saving bm25 model to {output}/bm25_model")
