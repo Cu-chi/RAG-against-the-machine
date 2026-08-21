@@ -222,6 +222,7 @@ class RAGCLI:
             .model_validate_json(search_results_json)
 
         score = 0.0
+        evaluated = 0.0
         for question in tqdm(rag_dataset.rag_questions,
                              desc="Evaluating..."):
             found = False
@@ -235,6 +236,7 @@ class RAGCLI:
             if not isinstance(question, AnsweredQuestion):
                 print(f"skipping not answered question {question.question_id}")
                 continue
+            evaluated += 1.0
             for source in question.sources:
                 for res_source in results.retrieved_sources:
                     if source.file_path == res_source.file_path:
@@ -247,7 +249,10 @@ class RAGCLI:
                             found = True
             if found:
                 score += 1.0
-        return score / len(rag_dataset.rag_questions)
+        if evaluated == 0.0:
+            print("Warning: 0 question evaluated")
+            return 0.0
+        return score / evaluated
 
 
 def main() -> None:
