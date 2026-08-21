@@ -8,7 +8,7 @@ class ContextBuilder:
     def get_context(self, file_path: str, start_idx: int, end_idx: int) -> str:
         if file_path not in self.file_cache:
             try:
-                with open(file_path, "r") as f:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                     self.file_cache[file_path] = f.read()
             except Exception as e:
                 print(f"error: can't read {file_path}: {e}")
