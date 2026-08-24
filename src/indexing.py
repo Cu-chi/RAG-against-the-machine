@@ -1,3 +1,4 @@
+"""Module with function to index the data."""
 import bm25s
 from typing import List
 from langchain_core.documents import Document
@@ -6,6 +7,12 @@ from pathlib import Path
 
 def store_chunks(chunks: List[Document],
                  output: str = "data/processed/") -> None:
+    """Index and store the model to specified output.
+
+    Args:
+        chunks (List[Document]): chunks to index
+        output (str, optional): output dir. Defaults to "data/processed/".
+    """
     corpus = [chunk.page_content for chunk in chunks]
     metadata_corpus = [{"page_content": chunk.page_content,
                         "metadata": chunk.metadata} for chunk in chunks]

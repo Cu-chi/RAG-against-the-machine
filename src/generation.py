@@ -1,3 +1,4 @@
+"""Module with the class for the LLM generation."""
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils.logging import disable_progress_bar
 import torch
@@ -5,7 +6,15 @@ from typing import Any
 
 
 class LLMGenerator:
+    """Class used for the generation."""
+
     def __init__(self, model_name: str = "Qwen/Qwen3-0.6B") -> None:
+        """Initialize the LLMGenerator class.
+
+        Args:
+            model_name (str, optional): Model name to load using HF.
+            Defaults to "Qwen/Qwen3-0.6B".
+        """
         print("Loading model...")
         disable_progress_bar()
         self.tokenizer: Any = AutoTokenizer.from_pretrained(model_name)
@@ -17,6 +26,15 @@ class LLMGenerator:
         )
 
     def generate_answer(self, query: str, context: str) -> str:
+        """Generate an answer for the query using the model.
+
+        Args:
+            query (str): the query to answer.
+            context (str): context for the model.
+
+        Returns:
+            str: the answer using the context
+        """
         messages = [
             {"role": "system", "content": "You are a helpful coding assistant."
                                           " Answer based on the provided "

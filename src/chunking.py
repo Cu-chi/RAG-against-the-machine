@@ -1,3 +1,4 @@
+"""Module with functions used to chunk documents."""
 import glob
 from tqdm import tqdm
 from typing import Any
@@ -7,7 +8,7 @@ from langchain_text_splitters import PythonCodeTextSplitter, \
 
 
 def get_files(root: str, extensions: list[str]) -> dict[str, list[str]]:
-    """Get all files path ending by any of extensions given
+    """Get all files path ending by any of extensions given.
 
     Args:
         extensions (list[str]): files possible extensions
@@ -27,6 +28,11 @@ def get_files(root: str, extensions: list[str]) -> dict[str, list[str]]:
 
 def create_documents(extensions_files: dict[str, list[str]]) \
      -> list[Document]:
+    """From the list of files, return a list of document.
+
+    Returns:
+        list[Document]: the list of document
+    """
     documents: list[Document] = []
     for extension, files in extensions_files.items():
         for file in files:
@@ -44,6 +50,15 @@ def create_documents(extensions_files: dict[str, list[str]]) \
 
 def chunk_files(documents: list[Document],
                 max_chunk_size: int) -> list[Document]:
+    """Chunk documents.
+
+    Args:
+        documents (list[Document]): the documents to chunk
+        max_chunk_size (int): max size of a chunk
+
+    Returns:
+        list[Document]: the documents chunked
+    """
     chunks: list[Document] = []
     py_splitter = PythonCodeTextSplitter(
         chunk_size=max_chunk_size,

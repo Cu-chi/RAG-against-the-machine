@@ -1,3 +1,4 @@
+"""Main of the RAG project."""
 import fire
 import uuid
 import bm25s
@@ -17,7 +18,15 @@ from src.utils import find_question_id_index, calculate_IoU
 
 
 class RAGCLI:
+    """Class used by Fire module to make the CLI."""
+
     def index(self, max_chunk_size: int = 2000) -> None:
+        """Index the data in data/raw.
+
+        Args:
+            max_chunk_size (int, optional): maximum size of a chunk.
+            Defaults to 2000.
+        """
         if max_chunk_size <= 0:
             print("max_chunk_size must be > 0")
             sys.exit(1)
@@ -74,6 +83,16 @@ class RAGCLI:
     def search(self, query: str, k: int,
                id: str = str(uuid.uuid4()),
                retriever: bm25s.BM25 | None = None) -> None:
+        """Search indexed documents that have a link with the query.
+
+        Args:
+            query (str): Query
+            k (int): maximum number of documents
+            id (str, optional): the question id.
+            Defaults to str(uuid.uuid4()).
+            retriever (bm25s.BM25 | None, optional): The retriever.
+            Defaults to None.
+        """
         search_results: StudentSearchResults = self._search_internal(query, k,
                                                                      id,
                                                                      retriever)
@@ -82,6 +101,13 @@ class RAGCLI:
 
     def search_dataset(self, dataset_path: str,
                        k: int, save_directory: str) -> None:
+        """Search using a dataset.
+
+        Args:
+            dataset_path (str): path to dataset
+            k (int): max number of documents to search for each question
+            save_directory (str): save directory
+        """
         if k <= 0:
             print("k must be > 0")
             sys.exit(1)
@@ -145,12 +171,28 @@ class RAGCLI:
         )
 
     def answer(self, query: str, k: int) -> None:
+        """Answer to the query.
+
+        Answer to the query with a context retrieved from
+        the indexed documents.
+
+        Args:
+            query (str): query
+            k (int): max number of documents for context
+        """
         answer_result = self._answer_internal(query, k)
 
         print(answer_result.model_dump_json(indent=4))
 
     def answer_dataset(self, student_search_results_path: str,
                        save_directory: str) -> None:
+        """Answer each unanswered question of a dataset.
+
+        Args:
+            student_search_results_path (str): dataset with already
+            searched results.
+            save_directory (str): save directory
+        """
         if not student_search_results_path.endswith(".json"):
             print("student_search_results_path must point to a .json file")
             sys.exit(1)
@@ -197,6 +239,19 @@ class RAGCLI:
 
     def evaluate(self, student_search_results_path: str,
                  dataset_path: str) -> float:
+        """Debug command to evaluate the recall@k.
+
+        It evaluates the percentage of valid source.
+        A correct source counts as found when one of your results is
+        in the same file and overlaps its character range.
+
+        Args:
+            student_search_results_path (str): search results path
+            dataset_path (str): the dataset path
+
+        Returns:
+            float: _description_
+        """
         if not dataset_path.endswith(".json"):
             print("dataset_path must point to a .json file")
             sys.exit(1)
@@ -256,6 +311,7 @@ class RAGCLI:
 
 
 def main() -> None:
+    """Run RAG."""
     load_dotenv()
     fire.Fire(RAGCLI)
 
