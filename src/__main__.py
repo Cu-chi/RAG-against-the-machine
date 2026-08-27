@@ -50,8 +50,11 @@ class RAGCLI:
             print("k must be > 0")
             sys.exit(1)
         if query == "" or query.isspace():
-            print("query is empty")
-            sys.exit(1)
+            print(f"Warning: Empty query for id {id}, skipping")
+            search_results = MinimalSearchResults(
+                question_id=id, question=query, retrieved_sources=[]
+            )
+            return StudentSearchResults(search_results=[search_results], k=k)
         if retriever is None:
             retriever = load_retriever()
         documents = search_query(query, retriever, k)
