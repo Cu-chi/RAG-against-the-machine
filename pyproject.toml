@@ -28,6 +28,7 @@ exclude = [
     ".mypy_cache",
     ".ruff_cache",
     ".venv",
+    "data",
 ]
 
 line-length = 80
