@@ -14,6 +14,7 @@ debug:
 
 clean:
 	$(foreach cache, $(CACHES), @rm -rf $$(find . -type d -name "$(cache)"))
+	@rm -rf data/processed
 	@echo temporary files and caches deleted
 
 format:
