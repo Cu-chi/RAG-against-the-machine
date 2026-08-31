@@ -27,8 +27,8 @@ class RAGCLI:
             max_chunk_size (int, optional): maximum size of a chunk.
             Defaults to 2000.
         """
-        if max_chunk_size <= 0:
-            print("max_chunk_size must be > 0")
+        if max_chunk_size <= 0 or max_chunk_size > 2000:
+            print("max_chunk_size must be between 1 and 2000 characters")
             sys.exit(1)
         extensions_files = get_files("data/raw",  [
             ".py",
