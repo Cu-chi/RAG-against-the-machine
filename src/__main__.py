@@ -147,7 +147,7 @@ class RAGCLI:
         with open(f"{save_dir}/{dataset.name}", "w+") as f:
             f.write(model_json)
 
-        print(model_json)
+        print(f"Saved student_search_results to {save_dir}/{dataset.name}")
 
     def _answer_internal(self, query: str,
                          k: int) -> StudentSearchResultsAndAnswer:
@@ -242,7 +242,8 @@ class RAGCLI:
         with open(f"{save_dir}/{results_path.name}", "w+") as f:
             f.write(model_json)
 
-        print(model_json)
+        print("Saved student_search_results_and_answer to "
+              f"{save_dir}/{results_path.name}")
 
     def evaluate(self, student_search_results_path: str,
                  dataset_path: str) -> float:
