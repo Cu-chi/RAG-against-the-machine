@@ -28,7 +28,8 @@ class RAGCLI:
             Defaults to 2000.
         """
         if max_chunk_size <= 0 or max_chunk_size > 2000:
-            print("max_chunk_size must be between 1 and 2000 characters")
+            print("max_chunk_size must be between 1 and 2000 characters",
+                  file=sys.stderr)
             sys.exit(1)
         extensions_files = get_files("data/raw",  [
             ".py",
@@ -37,7 +38,8 @@ class RAGCLI:
         extensions_documents = create_documents(extensions_files)
         if len(extensions_documents) == 0:
             print("no document to chunk, can't index. "
-                  "data/raw folder must have .md and .py files")
+                  "data/raw folder must have .md and .py files",
+                  file=sys.stderr)
             sys.exit(1)
         chunks = chunk_files(extensions_documents, max_chunk_size)
         store_chunks(chunks)
@@ -47,7 +49,7 @@ class RAGCLI:
                          retriever: bm25s.BM25 | None = None) \
             -> StudentSearchResults:
         if k <= 0:
-            print("k must be > 0")
+            print("k must be > 0", file=sys.stderr)
             sys.exit(1)
         if query == "" or query.isspace():
             print(f"Warning: Empty query for id {id}, skipping")
@@ -112,14 +114,14 @@ class RAGCLI:
             save_directory (str): save directory
         """
         if k <= 0:
-            print("k must be > 0")
+            print("k must be > 0", file=sys.stderr)
             sys.exit(1)
         if not dataset_path.endswith(".json"):
-            print("dataset_path must point to a .json file")
+            print("dataset_path must point to a .json file", file=sys.stderr)
             sys.exit(1)
         dataset = Path(dataset_path)
         if not dataset.exists():
-            print(f"'{dataset_path}' doesn't exist")
+            print(f"'{dataset_path}' doesn't exist", file=sys.stderr)
             sys.exit(1)
 
         json_dataset = dataset.read_text()
@@ -197,11 +199,13 @@ class RAGCLI:
             save_directory (str): save directory
         """
         if not student_search_results_path.endswith(".json"):
-            print("student_search_results_path must point to a .json file")
+            print("student_search_results_path must point to a .json file",
+                  file=sys.stderr)
             sys.exit(1)
         results_path = Path(student_search_results_path)
         if not results_path.exists():
-            print(f"'{student_search_results_path}' doesn't exist")
+            print(f"'{student_search_results_path}' doesn't exist",
+                  file=sys.stderr)
             sys.exit(1)
 
         json_results = results_path.read_text()
@@ -256,11 +260,11 @@ class RAGCLI:
             float: _description_
         """
         if not dataset_path.endswith(".json"):
-            print("dataset_path must point to a .json file")
+            print("dataset_path must point to a .json file", file=sys.stderr)
             sys.exit(1)
         dataset = Path(dataset_path)
         if not dataset.exists():
-            print(f"{dataset} doesn't exist")
+            print(f"{dataset} doesn't exist", file=sys.stderr)
             sys.exit(1)
 
         dataset_json = dataset.read_text()
@@ -268,11 +272,13 @@ class RAGCLI:
             .model_validate_json(dataset_json)
 
         if not student_search_results_path.endswith(".json"):
-            print("student_search_results_path must point to a .json file")
+            print("student_search_results_path must point to a .json file",
+                  file=sys.stderr)
             sys.exit(1)
         search_results_path = Path(student_search_results_path)
         if not search_results_path.exists():
-            print(f"{student_search_results_path} doesn't exist")
+            print(f"{student_search_results_path} doesn't exist",
+                  file=sys.stderr)
             sys.exit(1)
 
         search_results_json = search_results_path.read_text()
