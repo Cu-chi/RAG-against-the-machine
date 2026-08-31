@@ -9,6 +9,7 @@ dependencies = [
     "bm25s>=0.3.10",
     "chromadb>=1.5.9",
     "dspy>=3.2.1",
+    "fastapi>=0.141.1",
     "fire>=0.7.1",
     "flake8>=7.3.0",
     "langchain-chroma>=1.1.0",
@@ -19,6 +20,7 @@ dependencies = [
     "ruff>=0.15.17",
     "torch>=2.12.1",
     "transformers>=5.12.1",
+    "uvicorn>=0.49.0",
 ]
 
 [tool.ruff]

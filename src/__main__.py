@@ -318,6 +318,18 @@ class RAGCLI:
             return 0.0
         return score / evaluated
 
+    def serve(self, host: str = "127.0.0.1", port: int = 8000) -> None:
+        """Start the local HTTP API server.
+
+        Args:
+            host (str, optional): The host. Defaults to "127.0.0.1".
+            port (int, optional): The port. Defaults to 8000.
+        """
+        import uvicorn
+        print(f"Starting server on http://{host}:{port}")
+        print(f"Documentation available on http://{host}:{port}/docs")
+        uvicorn.run("src.api:app", host=host, port=port)
+
 
 def main() -> None:
     """Run RAG."""
