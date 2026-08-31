@@ -69,9 +69,8 @@ class RAGCLI:
                 continue
             minimal_sources.append(MinimalSource(
                 file_path=metadata.get("source", ""),
-                first_character_index=metadata.get("first_character_index",
-                                                   ""),
-                last_character_index=metadata.get("last_character_index", "")
+                first_character_index=metadata.get("first_character_index", 0),
+                last_character_index=metadata.get("last_character_index", 0)
             ))
 
         search_results = MinimalSearchResults(
