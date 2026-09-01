@@ -15,7 +15,6 @@ https://docs.astral.sh/uv/getting-started/installation/
 - **Space:** Ensure you have enough disk space for the Hugging Face model weights.  
 Optional: setup your HF_TOKEN from https://huggingface.co/settings/tokens
 
-# Installation
 Clone the repository and install the dependencies using the provided Makefile:
 ```bash
 make install
@@ -32,11 +31,23 @@ The pipeline is driven by a CLI built with Python Fire. You must run the command
 3. Generation
 ```uv run python -m src answer_dataset --student_search_results_path data/output/search_results/UnansweredQuestions/dataset_docs_public.json --save_directory data/output/search_results_and_answer/UnansweredQuestions```
 
+## List of commands and arguments
+See all conmmands:
+```
+uv run python -m src
+```
+
+Get info on a command:
+```
+uv run python -m src [COMMAND] --help
+```
+
 # System Architecture
-chunking.py: Ingests files using glob and splits them using Langchain's text splitters while preserving start/end character indices.  
+chunking.py: Ingests files using glob and splits them using Langchain's text splitters while preserving start/end character indices. Bonus: creates a manifest with hash of each file.   
 indexing.py & retriever.py: Implements the search engine using bm25s. The index is persistently saved to disk.  
 context.py (File Cache): Lazy-loading file cache. Instead of redundant Disk I/O operations, files are loaded into RAM once, preventing bottlenecks during dataset generation.  
 generation.py: Wraps the Hugging Face transformers logic. The model is loaded only once per dataset run, optimizing VRAM and CPU usage.  
+api.py: exposes querying the index and answering questions using FastAPI and running it with uvicorn. 
 __main__.py: Exposes the CLI through python-fire, separating logic from I/O formatting.  
 
 # Chunking Strategy
