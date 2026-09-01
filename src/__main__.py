@@ -307,7 +307,7 @@ class RAGCLI:
             dataset_path (str): the dataset path
 
         Returns:
-            float: _description_
+            float: recall@k
         """
         from tqdm import tqdm
         from pathlib import Path
