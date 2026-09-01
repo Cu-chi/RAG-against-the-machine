@@ -13,7 +13,7 @@ The project uses vLLM but we can produce same result with any codebase or any ot
 - **Package Manager:** `uv`
 https://docs.astral.sh/uv/getting-started/installation/
 - **Space:** Ensure you have enough disk space for the Hugging Face model weights.  
-Optional: setup your HF_TOKEN from https://huggingface.co/settings/tokens
+Optional: setup your HF_TOKEN from https://huggingface.co/settings/tokens/new?preset=read-only
 
 Clone the repository and install the dependencies using the provided Makefile:
 ```bash
