@@ -3,9 +3,11 @@ import fire
 import uuid
 import bm25s
 import sys
+import json
 from tqdm import tqdm
+from src.chunking import get_incremental_files
 from dotenv import load_dotenv
-from src.chunking import get_files, create_documents, chunk_files
+from src.chunking import create_documents, chunk_files
 from src.indexing import store_chunks
 from src.retriever import search_query, load_retriever
 from src.models import MinimalSearchResults, MinimalSource, \
@@ -31,18 +33,53 @@ class RAGCLI:
             print("max_chunk_size must be between 1 and 2000 characters",
                   file=sys.stderr)
             sys.exit(1)
-        extensions_files = get_files("data/raw",  [
-            ".py",
-            ".md"
-        ])
-        extensions_documents = create_documents(extensions_files)
-        if len(extensions_documents) == 0:
-            print("no document to chunk, can't index. "
-                  "data/raw folder must have .md and .py files",
-                  file=sys.stderr)
+
+        changed_files, current_hashes, is_incremental = get_incremental_files(
+            "data/raw", [".py", ".md"], max_chunk_size)
+        total_changed = sum(len(f) for f in changed_files.values())
+
+        if is_incremental and total_changed == 0:
+            print("Index is already up to date. (0 files changed)")
+            return
+        elif is_incremental:
+            print(f"Incremental update: {total_changed}"
+                  " modified/new file(s) detected")
+            retriever = load_retriever()
+            existing_corpus = retriever.corpus
+
+            changed_paths = set()
+            for files in changed_files.values():
+                changed_paths.update(files)
+
+            kept_chunks = []
+            for doc in existing_corpus:
+                if doc["metadata"]["source"] not in changed_paths:
+                    from langchain_core.documents import Document
+                    kept_chunks.append(Document(
+                        page_content=doc["page_content"],
+                        metadata=doc["metadata"]
+                    ))
+        else:
+            kept_chunks = []
+
+        new_documents = create_documents(changed_files)
+        new_chunks = chunk_files(new_documents, max_chunk_size)
+
+        final_chunks = kept_chunks + new_chunks
+        if len(final_chunks) == 0:
+            print("No documents found to index.")
             sys.exit(1)
-        chunks = chunk_files(extensions_documents, max_chunk_size)
-        store_chunks(chunks)
+
+        store_chunks(final_chunks)
+
+        with open("data/processed/manifest.json", "w", encoding="utf-8") as f:
+            json.dump({
+                "max_chunk_size": max_chunk_size,
+                "files": current_hashes
+            }, f, indent=4)
+
+        print(f"Ingestion complete! Indexed {len(final_chunks)} chunks "
+              "under data/processed/")
 
     def _search_internal(self, query: str, k: int,
                          id: str = str(uuid.uuid4()),

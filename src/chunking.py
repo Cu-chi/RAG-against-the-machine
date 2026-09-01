@@ -5,6 +5,65 @@ from typing import Any
 from langchain_core.documents import Document
 from langchain_text_splitters import PythonCodeTextSplitter, \
     MarkdownTextSplitter
+import hashlib
+import json
+from pathlib import Path
+
+
+def compute_file_hash(file_path: str) -> str:
+    """Calculate the MD5 of a file.
+
+    Args:
+        file_path (str): The file
+
+    Returns:
+        str: the MD5 hash
+    """
+    try:
+        with open(file_path, "rb") as f:
+            return hashlib.md5(f.read()).hexdigest()
+    except Exception:
+        return ""
+
+
+def get_incremental_files(root: str, extensions: list[str],
+                          max_chunk_size: int)\
+        -> tuple[dict[str, list[str]], dict[str, str], bool]:
+    """Detect added or edited files using the manifest.
+
+    Returns:
+        tuple[dict[str, list[str]], dict[str, str], bool]: changed files,
+        current hashes and manifest exists
+    """
+    all_files = get_files(root, extensions)
+    current_hashes: dict[str, str] = {}
+    for files in all_files.values():
+        for f in files:
+            current_hashes[f] = compute_file_hash(f)
+
+    manifest_file = Path("data/processed/manifest.json")
+    if not manifest_file.exists():
+        return all_files, current_hashes, False
+
+    try:
+        manifest_data = json.loads(manifest_file.read_text(encoding="utf-8"))
+        old_chunk_size: int = manifest_data.get("max_chunk_size", 0)
+        old_hashes: dict[str, str] = manifest_data.get("files", {})
+    except Exception:
+        return all_files, current_hashes, False
+
+    if old_chunk_size != max_chunk_size:
+        print(f"max_chunk_size changed ({old_chunk_size} -> {max_chunk_size})."
+              " Full re-index required.")
+        return all_files, current_hashes, False
+
+    changed_files: dict[str, list[str]] = {ext: [] for ext in extensions}
+    for ext, files in all_files.items():
+        for f in files:
+            if f not in old_hashes or old_hashes[f] != current_hashes[f]:
+                changed_files[ext].append(f)
+
+    return changed_files, current_hashes, True
 
 
 def get_files(root: str, extensions: list[str]) -> dict[str, list[str]]:
