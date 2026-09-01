@@ -3,20 +3,8 @@ import fire
 import uuid
 import bm25s
 import sys
-import json
-from tqdm import tqdm
-from src.chunking import get_incremental_files
 from dotenv import load_dotenv
-from src.chunking import create_documents, chunk_files
-from src.indexing import store_chunks
-from src.retriever import search_query, load_retriever
-from src.models import MinimalSearchResults, MinimalSource, \
-    RagDataset, UnansweredQuestion, StudentSearchResults, \
-    MinimalAnswer, StudentSearchResultsAndAnswer, AnsweredQuestion
-from src.generation import LLMGenerator
-from src.context import ContextBuilder
-from pathlib import Path
-from src.utils import find_question_id_index, calculate_IoU
+from src.models import StudentSearchResults, StudentSearchResultsAndAnswer
 
 
 class RAGCLI:
@@ -29,6 +17,12 @@ class RAGCLI:
             max_chunk_size (int, optional): maximum size of a chunk.
             Defaults to 2000.
         """
+        import json
+        from src.chunking import get_incremental_files, create_documents, \
+            chunk_files
+        from src.indexing import store_chunks
+        from src.retriever import load_retriever
+
         if max_chunk_size <= 0 or max_chunk_size > 2000:
             print("max_chunk_size must be between 1 and 2000 characters",
                   file=sys.stderr)
@@ -85,6 +79,9 @@ class RAGCLI:
                          id: str = str(uuid.uuid4()),
                          retriever: bm25s.BM25 | None = None) \
             -> StudentSearchResults:
+        from src.models import MinimalSearchResults, MinimalSource, \
+            StudentSearchResults
+        from src.retriever import search_query, load_retriever
         if k <= 0:
             print("k must be > 0", file=sys.stderr)
             sys.exit(1)
@@ -134,6 +131,7 @@ class RAGCLI:
             retriever (bm25s.BM25 | None, optional): The retriever.
             Defaults to None.
         """
+        from src.models import StudentSearchResults
         search_results: StudentSearchResults = self._search_internal(query, k,
                                                                      id,
                                                                      retriever)
@@ -149,6 +147,11 @@ class RAGCLI:
             k (int): max number of documents to search for each question
             save_directory (str): save directory
         """
+        from tqdm import tqdm
+        from src.retriever import load_retriever
+        from pathlib import Path
+        from src.models import RagDataset, UnansweredQuestion, \
+            StudentSearchResults
         if k <= 0:
             print("k must be > 0", file=sys.stderr)
             sys.exit(1)
@@ -187,6 +190,10 @@ class RAGCLI:
 
     def _answer_internal(self, query: str,
                          k: int) -> StudentSearchResultsAndAnswer:
+        from src.retriever import load_retriever
+        from src.generation import LLMGenerator
+        from src.context import ContextBuilder
+        from src.models import MinimalAnswer, StudentSearchResultsAndAnswer
         generator = LLMGenerator()
 
         retriver = load_retriever()
@@ -234,6 +241,12 @@ class RAGCLI:
             searched results.
             save_directory (str): save directory
         """
+        from tqdm import tqdm
+        from pathlib import Path
+        from src.generation import LLMGenerator
+        from src.context import ContextBuilder
+        from src.models import StudentSearchResults, MinimalAnswer, \
+            StudentSearchResultsAndAnswer
         if not student_search_results_path.endswith(".json"):
             print("student_search_results_path must point to a .json file",
                   file=sys.stderr)
@@ -296,6 +309,11 @@ class RAGCLI:
         Returns:
             float: _description_
         """
+        from tqdm import tqdm
+        from pathlib import Path
+        from src.utils import find_question_id_index, calculate_IoU
+        from src.models import RagDataset, StudentSearchResults, \
+            AnsweredQuestion
         if not dataset_path.endswith(".json"):
             print("dataset_path must point to a .json file", file=sys.stderr)
             sys.exit(1)
