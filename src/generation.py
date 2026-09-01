@@ -42,7 +42,6 @@ class LLMGenerator:
             {"role": "user", "content":
                 f"""Use the following pieces of retrieved context to answer
 the question.
-If you don't know the answer, just say "I don't know".
 Keep the answer concise and strictly based on the context.
 
 Context:
