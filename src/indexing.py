@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def store_chunks(chunks: List[Document],
-                 output: str = "data/processed/") -> None:
+                 output: str = "data/processed") -> None:
     """Index and store the model to specified output.
 
     Args:
