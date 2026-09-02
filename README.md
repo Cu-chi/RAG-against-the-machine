@@ -20,6 +20,8 @@ Clone the repository and install the dependencies using the provided Makefile:
 make install
 ```
 
+Put the codebase under `data/raw`
+
 The pipeline is driven by a CLI built with Python Fire. You must run the commands in the following order (paths are example):
 
 1. Index corpus  
