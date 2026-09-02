@@ -61,7 +61,7 @@ class RAGCLI:
 
         final_chunks = kept_chunks + new_chunks
         if len(final_chunks) == 0:
-            print("No documents found to index.")
+            print("No documents found to index in data/raw.")
             sys.exit(1)
 
         store_chunks(final_chunks)
