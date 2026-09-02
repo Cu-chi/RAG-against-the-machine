@@ -27,4 +27,4 @@ lint:
 	uv run python -m flake8 src
 	uv run python -m mypy src $(MYPY_FLAGS)
 
-.PHONY: install run debug clean lint
+.PHONY: install run debug clean lint format-check format
