@@ -3,9 +3,9 @@
 # RAG against the machine
 
 # Description
-This project implements a Retrieval-Augmented Generation (RAG) pipeline from scratch to answer questions based on a specific codebase (vLLM). The goal is to ingest and index documentation and Python code, retrieve the most relevant snippets for a given user query using a lexical search engine, and ultimately generate a grounded, hallucination-free answer using a small local Large Language Model (Qwen3-0.6B).
+This project implements a Retrieval-Augmented Generation (RAG) pipeline from scratch to answer questions based on a specific codebase. The goal is to ingest and index documentation and Python code, retrieve the most relevant snippets for a given user query using a lexical search engine, and ultimately generate a grounded, hallucination-free answer using a small local Large Language Model (Qwen3-0.6B).
 
-The project uses vLLM but we can produce same result with any codebase or any other types of documents that can be used as context for a model.
+While this project uses vLLM as a reference codebase, the pipeline is completely agnostic and can be applied to any codebase or document collection. By default, it indexes .py and .md files, but the supported file extensions can easily be configured to retrieve context from other programming languages or documentation formats.
 
 # Instructions
 ## Prerequisites
