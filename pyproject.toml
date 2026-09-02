@@ -5,15 +5,10 @@ description = "Retrieval-Augmented Generation (RAG) system that can answer quest
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "accelerate>=1.14.0",
     "bm25s>=0.3.10",
-    "chromadb>=1.5.9",
-    "dspy>=3.2.1",
     "fastapi>=0.141.1",
     "fire>=0.7.1",
     "flake8>=7.3.0",
-    "langchain-chroma>=1.1.0",
-    "langchain-huggingface>=1.2.2",
     "langchain-text-splitters>=1.1.2",
     "mypy>=2.1.0",
     "pydantic>=2.13.4",
